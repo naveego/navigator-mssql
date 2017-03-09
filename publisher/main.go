@@ -74,3 +74,13 @@ func (h *publisherHandler) DiscoverShapes(request protocol.DiscoverShapesRequest
 		Shapes: shapes,
 	}, nil
 }
+
+func (h *publisherHandler) Publish(request protocol.PublishRequest, transport publisher.DataTransport) {
+	pub := mssql.NewPublisher()
+	ctx := publisher.Context{
+		Logger:            logrus.WithField("dev", "dev"),
+		PublisherInstance: request.PublisherInstance,
+	}
+
+	pub.Publish(ctx, request.PublishedShape, transport)
+}
