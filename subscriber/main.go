@@ -74,3 +74,20 @@ func (h *subscriberHandler) DiscoverShapes(request protocol.DiscoverShapesReques
 		Shapes: shapes,
 	}, nil
 }
+
+func (h *subscriberHandler) ReceiveDataPoint(request protocol.ReceiveShapeRequest) (protocol.ReceiveShapeResponse, error) {
+	sub := mssql.NewSubscriber()
+	ctx := subscriber.Context{
+		Subscriber: request.SubscriberInstance,
+		Pipeline:   request.Pipeline,
+	}
+
+	err := sub.Receive(ctx, request.Shape, request.DataPoint)
+	if err != nil {
+		return protocol.ReceiveShapeResponse{Success: false, Message: err.Error()}, nil
+	}
+
+	return protocol.ReceiveShapeResponse{
+		Success: true,
+	}, nil
+}
