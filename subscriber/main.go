@@ -60,12 +60,12 @@ func (h *subscriberHandler) TestConnection(request protocol.TestConnectionReques
 }
 
 func (h *subscriberHandler) DiscoverShapes(request protocol.DiscoverShapesRequest) (protocol.DiscoverShapesResponse, error) {
-	pub := mssql.NewSubscriber()
+	sub := mssql.NewSubscriber()
 	ctx := subscriber.Context{
 		Subscriber: request.SubscriberInstance,
 	}
 
-	shapes, err := pub.Shapes(ctx)
+	shapes, err := sub.Shapes(ctx)
 	if err != nil {
 		return protocol.DiscoverShapesResponse{}, err
 	}
