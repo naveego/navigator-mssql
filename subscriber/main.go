@@ -42,7 +42,29 @@ func main() {
 	}
 }
 
-type subscriberHandler struct{}
+type subscriberHandler struct {
+	sub subscriber.Subscriber
+}
+
+func (h *subscriberHandler) Init(request protocol.InitRequest) (protocol.InitResponse, error) {
+	sub := mssql.NewSubscriber()
+	ctx := subscriber.Context{}
+
+	err := sub.Init(ctx, request.Settings)
+	if err != nil {
+		return protocol.InitResponse{
+				Success: false,
+				Message: err.Error(),
+			},
+			err
+	}
+
+	h.sub = sub
+
+	return protocol.InitResponse{
+		Success: true,
+	}, nil
+}
 
 func (h *subscriberHandler) TestConnection(request protocol.TestConnectionRequest) (protocol.TestConnectionResponse, error) {
 	sub := mssql.NewSubscriber()
@@ -76,18 +98,34 @@ func (h *subscriberHandler) DiscoverShapes(request protocol.DiscoverShapesReques
 }
 
 func (h *subscriberHandler) ReceiveDataPoint(request protocol.ReceiveShapeRequest) (protocol.ReceiveShapeResponse, error) {
-	sub := mssql.NewSubscriber()
 	ctx := subscriber.Context{
 		Subscriber: request.SubscriberInstance,
 		Pipeline:   request.Pipeline,
 	}
 
-	err := sub.Receive(ctx, request.Shape, request.DataPoint)
+	err := h.sub.Receive(ctx, request.Shape, request.DataPoint)
 	if err != nil {
 		return protocol.ReceiveShapeResponse{Success: false, Message: err.Error()}, nil
 	}
 
 	return protocol.ReceiveShapeResponse{
+		Success: true,
+	}, nil
+}
+
+func (h *subscriberHandler) Dispose(request protocol.DisposeRequest) (protocol.DisposeResponse, error) {
+	ctx := subscriber.Context{}
+
+	err := h.sub.Dispose(ctx)
+
+	if err != nil {
+		return protocol.DisposeResponse{
+			Success: false,
+			Message: err.Error(),
+		}, err
+	}
+
+	return protocol.DisposeResponse{
 		Success: true,
 	}, nil
 }
