@@ -76,6 +76,7 @@ func (h *publisherHandler) DiscoverShapes(request protocol.DiscoverShapesRequest
 }
 
 func (h *publisherHandler) Publish(request protocol.PublishRequest, transport publisher.DataTransport) {
+	logrus.Debug("Calling publish")
 	pub := mssql.NewPublisher()
 	ctx := publisher.Context{
 		Logger:            logrus.WithField("dev", "dev"),
