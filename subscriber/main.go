@@ -98,10 +98,7 @@ func (h *subscriberHandler) DiscoverShapes(request protocol.DiscoverShapesReques
 }
 
 func (h *subscriberHandler) ReceiveDataPoint(request protocol.ReceiveShapeRequest) (protocol.ReceiveShapeResponse, error) {
-	ctx := subscriber.Context{
-		Subscriber: request.SubscriberInstance,
-		Pipeline:   request.Pipeline,
-	}
+	ctx := subscriber.Context{}
 
 	err := h.sub.Receive(ctx, request.Shape, request.DataPoint)
 	if err != nil {
