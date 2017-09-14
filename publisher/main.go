@@ -122,14 +122,14 @@ func (h *publisherHandler) Publish(request protocol.PublishRequest, client proto
 	}
 
 	var shapeDef pipeline.ShapeDefinition
-	logrus.Infof("Looking for Shape: %s in %d shapes", request.ShapeName, len(h.shapes))
+	logrus.Debugf("Looking for Shape: %s in %d shapes", request.ShapeName, len(h.shapes))
 	for _, s := range h.shapes {
 		if s.Name == request.ShapeName {
 			shapeDef = s
 		}
 	}
 
-	logrus.Infof("Publshing Shape: %s", shapeDef.Name)
+	logrus.Debugf("Publshing Shape: %s", shapeDef.Name)
 	pub.Publish(ctx, shapeDef, &clientTransport{client})
 
 	return protocol.PublishResponse{Success: true, Message: "Published data points"}, nil
@@ -148,7 +148,6 @@ type clientTransport struct {
 }
 
 func (ct *clientTransport) Send(dataPoints []pipeline.DataPoint) error {
-	logrus.Debugf("Calling Send Data Point on Wrapped Transport")
 	req := protocol.SendDataPointsRequest{
 		DataPoints: dataPoints,
 	}
