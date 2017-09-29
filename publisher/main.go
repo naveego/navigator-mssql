@@ -7,12 +7,12 @@ import (
 
 	"github.com/naveego/api/types/pipeline"
 
-	"github.com/Sirupsen/logrus"
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/naveego/api/pipeline/publisher"
 	"github.com/naveego/navigator-go/publishers/protocol"
 	"github.com/naveego/navigator-go/publishers/server"
 	"github.com/naveego/pipeline-publishers/sql/mssql"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -32,9 +32,9 @@ func main() {
 
 	addr := os.Args[1]
 
-	//if *verbose {
-	logrus.SetLevel(logrus.DebugLevel)
-	//}
+	if *verbose {
+		logrus.SetLevel(logrus.DebugLevel)
+	}
 
 	srv := server.NewPublisherServer(addr, &publisherHandler{})
 
@@ -65,6 +65,7 @@ func (h *publisherHandler) TestConnection(request protocol.TestConnectionRequest
 }
 
 func (h *publisherHandler) DiscoverShapes(request protocol.DiscoverShapesRequest) (protocol.DiscoverShapesResponse, error) {
+	logrus.Debugf("Calling Discover Shapes: %v", request.Settings)
 	pub := h.getPublisher()
 	ctx := publisher.Context{
 		Settings: request.Settings,
@@ -151,6 +152,7 @@ func (ct *clientTransport) Send(dataPoints []pipeline.DataPoint) error {
 	req := protocol.SendDataPointsRequest{
 		DataPoints: dataPoints,
 	}
+
 	_, err := ct.client.SendDataPoints(req)
 	return err
 }
